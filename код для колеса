@@ -1,0 +1,62 @@
+#include <Stepper.h>  
+#include <iostream>
+#include <fstream>
+const int stepsPerRevolution = 200; // steps per revolution of your motor  
+// initialize the stepper library on pins 8 through 11:  
+Stepper myStepper(stepsPerRevolution, 2, 3, 4, 5);  
+   const int k1 = 1; 
+   const int k2 = 2; 
+   const int k3 = 3; 
+   const int k4 = 4; 
+   const int k5 = 5; 
+   const int k6 = 6; 
+   int d = 8;
+   int x0 = 0; 
+   int x1;
+   int x = 1;
+void setup() {  
+   // set the speed at 60 rpm:  
+   myStepper.setSpeed(30);  
+   // initialize the serial port:  
+   Serial.begin(9600);  
+   pinMode(d, OUTPUT);
+
+}  
+void loop() {  
+std::ofstream out; 
+  out.open("qr.txt"); 
+  switch (out) {
+    case k1:
+    x1 = 1;
+    break;
+    case k2:
+    x1 = 2;
+    break;
+    case k3:
+    x1 = 3;
+    break;
+    case k4:
+    x1 = 4;
+    break;
+    case k5:
+    x1 = 5;
+    break;
+    case k6:
+    x1 = 6;
+    break;
+  }
+  Serial.println(x1);
+    if (((x1 - x0) > 0) and ((x1 - x0) < 4)){ 
+      myStepper.step(((x1 - x0)* (100))); 
+    }
+    else {
+    myStepper.step(-((x1 - x0)* (100))); 
+  } 
+  x0 = x1; 
+  digitalWrite(d, HIGH);
+  delay(2000);
+  digitalWrite(d, LOW);
+  delay(2000);
+  myStepper.step(100);
+
+}
