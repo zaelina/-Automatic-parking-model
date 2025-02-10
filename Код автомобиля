@@ -1,0 +1,93 @@
+#define PWMA 11  // выходы arduino 
+#define PWMB 10 
+#define AIN1 6 
+#define AIN2 7 
+#define BIN1 5 
+#define BIN2 4 
+#define STBY 12 
+#define fotopin A0 
+#define PIN_TRIG 8 
+#define PIN_ECHO 9 
+long duration, cm; 
+int l = 100; 
+float x = 2; 
+int ss; 
+ 
+int motorSpeed = 35; //  скорость мотора 
+ 
+void setup() { 
+  Serial.begin(9600);  
+  pinMode(fotopin, INPUT);  
+  pinMode(PWMA, OUTPUT);   
+  pinMode(PWMB, OUTPUT);   
+  pinMode(AIN1, OUTPUT);   
+  pinMode(AIN2, OUTPUT);   
+  pinMode(BIN1, OUTPUT);   
+  pinMode(BIN2, OUTPUT);   
+  pinMode(STBY, OUTPUT);   
+  digitalWrite(STBY, HIGH);  
+  pinMode(PIN_TRIG, OUTPUT); 
+  pinMode(PIN_ECHO, INPUT); 
+ 
+} 
+ 
+void backward() { 
+  digitalWrite(AIN1, LOW);      // крутим моторы в одну сторону 
+  digitalWrite(AIN2, HIGH);     
+  digitalWrite(BIN1, LOW);   
+  digitalWrite(BIN2, HIGH);  
+  analogWrite(PWMB, motorSpeed);   
+  analogWrite(PWMA, motorSpeed); 
+} 
+ 
+void forward() { 
+  digitalWrite(AIN1, HIGH);   
+  digitalWrite(AIN2, LOW);  
+  digitalWrite(BIN1, HIGH);    // крутим моторы в противоположную сторону 
+  digitalWrite(BIN2, LOW);     
+  analogWrite(PWMB, motorSpeed);   
+  analogWrite(PWMA, motorSpeed);   
+} 
+ 
+void stop() {     
+  analogWrite(PWMB, 0);   
+  analogWrite(PWMA, 0);   
+} 
+ 
+void s(){ 
+  delay(250); 
+  digitalWrite(PIN_TRIG, LOW); 
+  delayMicroseconds(5); 
+  digitalWrite(PIN_TRIG, HIGH); 
+  delayMicroseconds(10); 
+  digitalWrite(PIN_TRIG, LOW); 
+  
+} 
+ 
+void loop() { 
+  s(); 
+  duration = pulseIn(PIN_ECHO, HIGH); 
+  ss = ((duration / 2) / 29.1); 
+  Serial.print(ss); 
+  Serial.print(" "); 
+  Serial.println(analogRead(fotopin)); 
+  if (analogRead(fotopin) > l) { 
+    s(); 
+    duration = pulseIn(PIN_ECHO, HIGH); 
+    ss = ((duration / 2) / 29.1); 
+    while (ss > x){ 
+      s(); 
+      duration = pulseIn(PIN_ECHO, HIGH); 
+      ss = ((duration / 2) / 29.1); 
+      forward(); 
+    } 
+    delay(1000); 
+  while (analogRead(fotopin) <= l) { 
+    stop(); 
+  } 
+  backward(); 
+  delay(10000); 
+  } else{ 
+  } 
+  stop(); 
+}
